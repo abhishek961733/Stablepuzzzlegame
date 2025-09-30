@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Stable Word Puzzle</title>
+  <style>
+    body {
+      font-family: 'Poppins', sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      background: linear-gradient(135deg, #6EE7B7, #3B82F6, #9333EA);
+      background-size: 400% 400%;
+      animation: gradientBG 12s ease infinite;
+      margin: 0;
+    }
+    @keyframes gradientBG {
+      0% {background-position: 0% 50%;}
+      50% {background-position: 100% 50%;}
+      100% {background-position: 0% 50%;}
+    }
+
+    .game-container {
+      background: rgba(255, 255, 255, 0.15);
+      backdrop-filter: blur(10px);
+      padding: 20px;
+      border-radius: 20px;
+      text-align: center;
+      color: #fff;
+      box-shadow: 0px 8px 25px rgba(0,0,0,0.2);
+    }
+
+    h1 {
+      margin-bottom: 15px;
+      font-size: 2rem;
+    }
+
+    #puzzle-grid {
+      display: grid;
+      grid-template-columns: repeat(6, 70px);
+      grid-template-rows: repeat(6, 70px);
+      gap: 6px;
+      margin: 20px auto;
+    }
+
+    .tile {
+      background: #2563eb;
+      border-radius: 12px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      color: white;
+      font-weight: bold;
+      font-size: 20px;
+      cursor: pointer;
+      transition: transform 0.2s;
+    }
+
+    .tile:hover {
+      transform: scale(1.1);
+      background: #1d4ed8;
+    }
+
+    #message {
+      margin-top: 15px;
+      font-size: 1.3rem;
+      font-weight: bold;
+      color: #fcd34d;
+    }
+  </style>
+</head>
+<body>
+  <div class="game-container">
+    <h1>🔗 Stable Word Puzzle</h1>
+    <p>Find the words related to Stable!</p>
+    <div id="puzzle-grid"></div>
+    <div id="message"></div>
+  </div>
+
+  <script>
+    const words = ["STABLE", "BLOCKCHAIN", "LAYER1", "USDT", "SECURE", "WALLET"];
+    const gridSize = 6;
+    const grid = document.getElementById("puzzle-grid");
+    const message = document.getElementById("message");
+
+    let gridData = [];
+
+    // Create empty grid
+    for (let i = 0; i < gridSize; i++) {
+      gridData[i] = new Array(gridSize).fill("");
+    }
+
+    // Make a list of all grid positions
+    let positions = [];
+    for (let i = 0; i < gridSize; i++) {
+      for (let j = 0; j < gridSize; j++) {
+        positions.push([i, j]);
+      }
+    }
+
+    // Shuffle positions
+    positions = positions.sort(() => Math.random() - 0.5);
+
+    // Place all letters of all words randomly
+    const allLetters = words.join("").split(""); // All letters
+    allLetters.forEach((letter, index) => {
+      let [row, col] = positions[index];
+      gridData[row][col] = letter;
+    });
+
+    // Fill empty spots with random letters
+    const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+    for (let i = 0; i < gridSize; i++) {
+      for (let j = 0; j < gridSize; j++) {
+        if (gridData[i][j] === "") {
+          gridData[i][j] = letters[Math.floor(Math.random() * letters.length)];
+        }
+      }
+    }
+
+    // Render grid
+    grid.innerHTML = "";
+    gridData.forEach(row => {
+      row.forEach(letter => {
+        const div = document.createElement("div");
+        div.className = "tile";
+        div.textContent = letter;
+        div.addEventListener("click", () => selectLetter(div));
+        grid.appendChild(div);
+      });
+    });
+
+    let selectedWord = "";
+
+    function selectLetter(tile) {
+      selectedWord += tile.textContent;
+      tile.style.background = "#10b981"; // green highlight
+
+      if (words.includes(selectedWord)) {
+        message.textContent = `🎉 Congratulations! You found "${selectedWord}"`;
+        selectedWord = "";
+      } else if (selectedWord.length > 12) {
+        message.textContent = "❌ Wrong, try again!";
+        selectedWord = "";
+        resetTiles();
+      }
+    }
+
+    function resetTiles() {
+      document.querySelectorAll(".tile").forEach(t => {
+        t.style.background = "#2563eb";
+      });
+    }
+  </script>
+</body>
+</html>
